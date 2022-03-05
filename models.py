@@ -24,6 +24,13 @@ class BaseModelMixin:
         except exc.IntegrityError:
             raise errors.BadLuck
 
+    def delete(self):
+        db.session.delete(self)
+        try:
+            db.session.commit()
+        except exc.IntegrityError:
+            raise errors.NotFound
+
 
 class User(db.Model, BaseModelMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -56,9 +63,8 @@ class User(db.Model, BaseModelMixin):
 class Ad(db.Model, BaseModelMixin):
     ad_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80), nullable=False)
-    description = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.String(255), nullable=False, unique=False)
     created = db.Column(db.DateTime, default=datetime.utcnow)
-    # created = db.Column(db.DateTime, server_default=db.func.now())
     owner = db.Column(db.Integer(), db.ForeignKey('user.id'))
 
     def __repr__(self):
@@ -66,9 +72,11 @@ class Ad(db.Model, BaseModelMixin):
 
     def to_dict(self):
         return {
-            'ad_id': self.id,
+            'ad_id': self.ad_id,
             'title': self.title,
             'description': self.description,
             "created": self.created,
             "owner": self.owner,
         }
+
+

@@ -31,8 +31,14 @@ class AdView(MethodView):
         ad.add()
         return jsonify(ad.to_dict())
 
+    def delete(self, ad_id):
+        ad = Ad.by_id(ad_id)
+        ad.delete()
+        return {'message': 'deleted'}
+
 
 app.add_url_rule('/users/<int:user_id>', view_func=UserView.as_view('users_get'), methods=['GET', ])
 app.add_url_rule('/users/', view_func=UserView.as_view('users_create'), methods=['POST', ])
 app.add_url_rule('/ads/<int:ad_id>', view_func=AdView.as_view('ads_get'), methods=['GET', ])
+app.add_url_rule('/ads/<int:ad_id>', view_func=AdView.as_view('ads_del'), methods=['DELETE', ])
 app.add_url_rule('/ads/', view_func=AdView.as_view('ads_create'), methods=['POST', ])
